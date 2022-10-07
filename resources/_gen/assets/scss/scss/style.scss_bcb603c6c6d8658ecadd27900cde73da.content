@@ -313,8 +313,8 @@ ul {
 .author-large {
   font-size: 20px; }
   .author-large img {
-    width: 50px;
-    height: 50px; }
+    width: 70px;
+    height: 70px; }
   .author-large .author-name {
     display: inline-block;
     vertical-align: middle;
