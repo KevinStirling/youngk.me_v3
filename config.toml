@@ -1,4 +1,4 @@
-baseURL = "kevinstirling.github.io/"
+baseURL = "/"
 languageCode = "en-us"
 title = "Home"
 themesDir = "themes"
