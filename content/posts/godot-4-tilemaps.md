@@ -22,8 +22,6 @@ Using the `TileMap` node's Layer system, I am able to split the background layer
 
 ![tilemap_layer](/images/posts/tilemap_layer.png "tilemap")
 
-Initially, for the sake of rapid prototyping, I was dumping all of the logic for moving the snake into the `GameManager.gd` file. This would soon change, because its foolish and bad.
-
 I created a `Snake` scene and added a `Snake.gd` script to the root `StaticBody2d` node, as well as adding a `Sprite2d` and `CollisionShape2d` of course.
 
 Here's what that script looks like at the moment for just covering the movement.
