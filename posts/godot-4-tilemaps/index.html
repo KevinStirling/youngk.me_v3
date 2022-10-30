@@ -58,7 +58,6 @@
 <p>The main scene contains a <code>TileMap</code> and a <code>Timer</code> node, underneath the parent <code>Node2d</code>, which has a script attached called <code>GameManager.gd</code>. The <code>TileMap</code> being the play area, and the <code>Timer</code> being the amount of time between each movement of the snake, which I currently have set to .5 seconds.</p>
 <p>Using the <code>TileMap</code> node&rsquo;s Layer system, I am able to split the background layer from the snake. This way, when I&rsquo;m modifying grid squares of the <code>TileMap</code> to show the snake move, I don&rsquo;t need to worry about redrawing the background.</p>
 <p><img src=/images/posts/tilemap_layer.png alt=tilemap_layer title=tilemap></p>
-<p>Initially, for the sake of rapid prototyping, I was dumping all of the logic for moving the snake into the <code>GameManager.gd</code> file. This would soon change, because its foolish and bad.</p>
 <p>I created a <code>Snake</code> scene and added a <code>Snake.gd</code> script to the root <code>StaticBody2d</code> node, as well as adding a <code>Sprite2d</code> and <code>CollisionShape2d</code> of course.</p>
 <p>Here&rsquo;s what that script looks like at the moment for just covering the movement.</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback># Snake.gd
