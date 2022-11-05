@@ -14,6 +14,12 @@
       "name": "linkedin",
       "url": "https://www.linkedin.com/in/kevin-young-5a6386b0/",
       "image": "images/social/linkedin.svg"
+    },
+    {
+      "name": "mastodon",
+      "url": "https://mastodon.gamedev.place/@kevinyoung",
+      "image": "images/social/mastodon.svg"
     }
+ 
   ]
 }
