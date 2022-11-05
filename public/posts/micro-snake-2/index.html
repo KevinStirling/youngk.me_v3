@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Giving snake an apple - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.png">
+
+  
+  
+  <link rel="stylesheet" href="/css/style.min.27361703c29e1b70be6d0c93b59d7651e1d2d8213d2522684c45473d897de092.css">
+  
+
+  
+    <meta name="description" content="Feeding the snake for growth, some stupid simple state management, and some code simplification"/>
+    <meta property="og:title" content="Giving snake an apple"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="/posts/micro-snake-2/"/>
+    <meta property="og:image" content="/images/posts/micro_snek.png"/>
+    <meta property="og:description" content="Feeding the snake for growth, some stupid simple state management, and some code simplification"/>
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:site" content="@kevinYENG"/>
+    <meta name="twitter:creator" content="@kevinYENG"/>
+  
+
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet"> 
+</head>
+
+
+
+
+<body class='page frame page-blog-single'>
+  <div id="menu-main-mobile" class="menu-main-mobile">
+    <ul class="menu">
+        
+        
+            
+                <li class="menu-item-posts">
+                    <a href="/posts/">Posts</a>
+                </li>
+            
+        
+    </ul>
+</div>
+  <div id="wrapper" class="wrapper">
+    <div class='header'>
+  <a class="header-logo" href="/">Home</a>
+  <div class="menu-main">
+    <ul>
+        
+        
+            <li class="menu-item-posts">
+                <a href="/posts/">Posts</a>
+            </li>
+        
+    </ul>
+  </div>
+  <div id="toggle-menu-main-mobile" class="hamburger-trigger">
+    <button class="hamburger">Menu</button>
+  </div>
+</div>
+    
+  <div class="blog">
+    
+      <div class="author">
+  <img width="30" class="author-image" src="/images/avatar.png" />
+  <span class="author-name">Kevin Young</span>
+  <span class="author-divider"></span>
+  <span class="author-date">November 5, 2022</span>
+</div>
+    
+    <div class="intro">
+      <h1>Giving snake an apple<span class="dot">.</span></h1>
+      
+      <img src="/images/posts/micro_snek.png" />
+      
+    </div>
+    <div class="content">
+      <p>Before tackling any new features, I wanted to make sure I atleast had a super bare minimum state management system in place. And a new beta for Godot 4 is out and I get to use a new (very minor) enhancement :D</p>
+<h2 id="managing-state">Managing state</h2>
+<p>This is pretty much as simple as you can get, which I think fits for the tiny scope of this project. For now this is what that looks like</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># GameManager.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">var current_state := GlobalVars.State.PAUSE
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">func set_state(new_state: GlobalVars.State):
+</span></span><span class="line"><span class="cl">	current_state = new_state
+</span></span><span class="line"><span class="cl">	match current_state:
+</span></span><span class="line"><span class="cl">		GlobalVars.State.PLAY:
+</span></span><span class="line"><span class="cl">			timer.start()
+</span></span><span class="line"><span class="cl">			timer.paused = false
+</span></span><span class="line"><span class="cl">		GlobalVars.State.PAUSE:
+</span></span><span class="line"><span class="cl">			timer.paused = true
+</span></span><span class="line"><span class="cl">		GlobalVars.State.DEAD:
+</span></span><span class="line"><span class="cl">			timer.stop()
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></div><p>As you can see, it really only needs to manage the timer for now.</p>
+<p><code>GlobalVars.gd</code> is an autoloaded file that simply has an enum called State.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># GlobalVars.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">extends Node
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">enum State {
+</span></span><span class="line"><span class="cl">	PAUSE,
+</span></span><span class="line"><span class="cl">	PLAY,
+</span></span><span class="line"><span class="cl">	DEAD
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><p>Now, any child nodes of the GameManager.tscn can set the state of the game by creating a reference to the GameManager node, and calling the <code>set_state</code> func.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># Snake.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">@onready var manager = get_parent()
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">manager.set_state(GlobalVars.State.PLAY)
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></div><h2 id="time-to-eat">Time to eat</h2>
+<p>Setting up the apple scene is simple. A <code>StaticBody2d</code> for the root node, attatch a <code>Sprite</code> node which for now I will lazily drop the snake tail&rsquo;s sprite into as a placehodler, and a <code>CollisionShape2d</code>.  For the snake to be able to eat this thing, we&rsquo;ll need a <code>Area2d</code> with a <code>CollisionShape2d</code> as its child node, which I have named <code>PickUpBoundary</code>.</p>
+<p>My inital plan was to use the <code>Area2d</code>&rsquo;s <code>body_entered</code> signal to trigger the function to make the snake grow. However for whatever reason, that signal is not working when the <code>Snake</code> body enters it. Everything is on the same collision layer and mask layer too, so it should be detectable. Might investigate this later and see if its a Godot 4 beta bug.</p>
+<p>So for a backup plan, I gave the <code>snake.tscn</code> an <code>Area2d</code> node called <code>PickUpArea</code>, and I instead connected the <code>area_entered</code> signal.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># Apple.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">extends Node2D
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">@onready var pickUpArea = $PickUpBoundary
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">signal spawn
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">func _ready():
+</span></span><span class="line"><span class="cl">	pickUpArea.area_entered.connect(_area_pickup)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">func _area_pickup(area):
+</span></span><span class="line"><span class="cl">	if area.get_parent().has_method(&#34;grow&#34;):
+</span></span><span class="line"><span class="cl">		area.get_parent().grow()
+</span></span><span class="line"><span class="cl">		emit_signal(&#34;spawn&#34;)
+</span></span></code></pre></div><p>The callback function simply checks if the parent of the <code>Area2d</code> that entered the <code>PickUpBoundary</code> has a <code>grow</code> method, and calls it if it does.  Which looks like this</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># Snake.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">func grow():
+</span></span><span class="line"><span class="cl">	var new_seg = grid_coords[grid_coords.size() - 1]
+</span></span><span class="line"><span class="cl">	grid_coords.append(new_seg)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></div><p>The reason I am able to simply set the  <code>Vector2</code> position for the new segment, rather than doing some vector math to calculate the next position, is thanks to my logic for moving the snake in my <code>_timer_timeout</code> func in the <code>GameManager.gd</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#GameManager.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">func _timer_timeout():
+</span></span><span class="line"><span class="cl">	var segment_next
+</span></span><span class="line"><span class="cl">	var segment_previous
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">	for s in range(snake.grid_coords.size()):
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">		else:
+</span></span><span class="line"><span class="cl">			grid.erase_cell(1, snake.grid_coords[s])
+</span></span><span class="line"><span class="cl">			segment_previous = snake.grid_coords[s]
+</span></span><span class="line"><span class="cl">			snake.grid_coords[s] = segment_next
+</span></span><span class="line"><span class="cl">			snake.body_segments[s].position = grid.map_to_local(snake.grid_coords[s])
+</span></span><span class="line"><span class="cl">			segment_next = segment_previous
+</span></span><span class="line"><span class="cl">	if current_state == GlobalVars.State.PLAY : 
+</span></span><span class="line"><span class="cl">		timer.start()
+</span></span></code></pre></div><p>Because I&rsquo;m just scooting the <code>Vector2</code>&rsquo;s by keeping the previous segment in memory, it just kinda works. It might <em>feel</em> a little lazy to have the last 2 <code>Vector2</code>&rsquo;s in the array be the same value for a moment, but in reality this means that when that last line <code>segment_next = segment_previous</code> is executed for the new snake tail segment, it&rsquo;s making the previous snake&rsquo;s last tail segment the new one, which is exactly what we want. It ends up having effect of &ldquo;growing forward&rdquo; as the snake moves, since the end of the tail does not move for one of the timer timeouts.</p>
+<p><img src="/images/posts/snek_apple.gif" alt="snek_apple" title="snek"></p>
+<h2 id="more-apple">More apple</h2>
+<p>As you can see in the gif above, we get a new apple when we eat one! I created a <code>spawn</code> signal in <code>Apple.gd</code> that is emitted when the apple&rsquo;s <code>area_entered</code> callback is triggered by the snake eating the apple.</p>
+<p>In the <code>GameManager.gd</code>, I set up a <code>_new_apple()</code> func that will spawn the new instance in a random location in the playarea.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># GameManager.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">func _new_apple():
+</span></span><span class="line"><span class="cl">	if get_node_or_null(&#34;Apple&#34;) == null :
+</span></span><span class="line"><span class="cl">		apple = apple.instantiate()
+</span></span><span class="line"><span class="cl">		add_child(apple)
+</span></span><span class="line"><span class="cl">		apple.spawn.connect(_new_apple)
+</span></span><span class="line"><span class="cl">	var temp_coords = bg_layer_coords 
+</span></span><span class="line"><span class="cl">	var new_apple_pos : Vector2 = temp_coords[randi() % temp_coords.size()]
+</span></span><span class="line"><span class="cl">	while snake.grid_coords.has(new_apple_pos):
+</span></span><span class="line"><span class="cl">		new_apple_pos = temp_coords.pick_random()
+</span></span><span class="line"><span class="cl">	apple.position = grid.map_to_local(new_apple_pos)
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></div><p>Here, we check to see if there is an Apple node in the scene tree. If there isn&rsquo;t we create an instance of one, and connect the <code>spawn</code> signal, the same signal that it emits on pickup. This is to make sure there is only one <code>Apple.tscn</code> instance, but this could change in the future.jh}</p>
+<p>Oh, and thanks to the newest Godot 4 beta, which is Beta 4, I get to use a new built in array method, <code>pick_random</code>!</p>
+<p>Previously to get a random array element you would have to do something like this</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">new_apple_pos = temp_coords[randi() % temp_coords.size()]
+</span></span></code></pre></div><p>Not the most riveting new feature to test but hey I&rsquo;m down. After that I have a while loop that will garuntee that the random value for the new Apple position is not occupied by the snake body.</p>
+<h2 id="other-improvements">Other improvements</h2>
+<p>I moved the code that is used to update the snake when there are new segments available at the moment of a timer timeout to an <code>update_snake()</code> function. This way it can be used by the <code>ready()</code>, <code>_timer_timeout()</code>, and whatever other function may need it.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># GameManager.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">func update_snake(grid_coords_pos = snake.grid_coords.size() - 1): 
+</span></span><span class="line"><span class="cl">	var current_segment = snake_segment.instantiate()
+</span></span><span class="line"><span class="cl">	add_child(current_segment)
+</span></span><span class="line"><span class="cl">	current_segment.position = grid.map_to_local(snake.grid_coords[grid_coords_pos])
+</span></span><span class="line"><span class="cl">	snake.body_segments.append(current_segment)
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></div><p>I also had to define a default value for the <code>grid_coords_pos</code> argument, since the <code>_timer_timeout()</code> func specifically needs the last segment of the snake to be updated, but the <code>ready()</code> func actually needs to call this for every snake body segment after the head, so the <code>ready()</code> func now looks like this</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># GameManager.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">func _ready():
+</span></span><span class="line"><span class="cl">	bg_layer_coords = grid.get_used_cells(0)
+</span></span><span class="line"><span class="cl">	timer.timeout.connect(_timer_timeout)
+</span></span><span class="line"><span class="cl">	snake = snake_head.instantiate()
+</span></span><span class="line"><span class="cl">	for s in range(snake.grid_coords.size()):
+</span></span><span class="line"><span class="cl">		if s == 0:
+</span></span><span class="line"><span class="cl">			add_child(snake)
+</span></span><span class="line"><span class="cl">			snake.position = grid.map_to_local(snake.grid_coords[s])
+</span></span><span class="line"><span class="cl">			snake.body_segments.push_front(snake)
+</span></span><span class="line"><span class="cl">		else:
+</span></span><span class="line"><span class="cl">			update_snake(s)
+</span></span><span class="line"><span class="cl">	_new_apple()
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></div><p>Next update will most likely be triggering the death state, and some bug fixes</p>
+
+    </div>
+  </div>
+
+    <div class="footer">
+  
+  <div class="footer-social">
+    
+      <span class="social-icon social-icon-twitter">
+        <a href="https://twitter.com/KevinYENG" title="twitter" target="_blank" rel="noopener">
+          <img src="/images/social/twitter.svg" width="24" height="24" alt="twitter"/>
+        </a>
+      </span>
+    
+      <span class="social-icon social-icon-github">
+        <a href="https://github.com/KevinStirling/" title="github" target="_blank" rel="noopener">
+          <img src="/images/social/github.svg" width="24" height="24" alt="github"/>
+        </a>
+      </span>
+    
+      <span class="social-icon social-icon-linkedin">
+        <a href="https://www.linkedin.com/in/kevin-young-5a6386b0/" title="linkedin" target="_blank" rel="noopener">
+          <img src="/images/social/linkedin.svg" width="24" height="24" alt="linkedin"/>
+        </a>
+      </span>
+    
+      <span class="social-icon social-icon-mastodon">
+        <a href="https://mastodon.gamedev.place/@kevinyoung" title="mastodon" target="_blank" rel="noopener">
+          <img src="/images/social/mastodon.svg" width="24" height="24" alt="mastodon"/>
+        </a>
+      </span>
+    
+  </div>
+  
+</div>
+  </div>
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/bundle.min.5993fcb11c07dea925a3fbd58c03c7f1857197c35fccce3aa963a12c0b3c9960.js"></script>
+  
+
+  
+  
+
+  
+  
+  
+    
+  
+
+
+</body>
+</html>
