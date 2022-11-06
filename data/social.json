@@ -18,7 +18,8 @@
     {
       "name": "mastodon",
       "url": "https://mastodon.gamedev.place/@kevinyoung",
-      "image": "images/social/mastodon.svg"
+      "image": "images/social/mastodon.svg",
+      "rel": "me"
     }
  
   ]
