@@ -6,8 +6,6 @@ image: images/posts/micro_snek.png
 tags: ["godot4"]
 draft: false 
 ---
-
-
 Before tackling any new features, I wanted to make sure I atleast had a super bare minimum state management system in place. And a new beta for Godot 4 is out and I get to use a new (very minor) enhancement :D 
 
 ## Managing state
