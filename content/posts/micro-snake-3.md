@@ -59,7 +59,7 @@ I added the SnakeHead node to a group "SnakeHead" as a lazy check, I'll admit. T
 As you can see from the header image, its pretty minimal. I added a new `TileMap` layer for the "frame", so the playarea does not end up being massive and take forever to traverse, and I can also decorate it later if I want / when I choose a final visual style. Overall a simple but pleasing enhancement from the janky floating window with dimensions that were slightly off from the `TileMap` :D
 
 ### Detecting wall collision
-Ideally, in Godot 4 I could simply add a physics collision layer to the `TileMap`. However, because I've chosen to not used any physics based movement, I don't think this is possible.
+Ideally, in Godot 4 I could simply add a physics collision layer to the `TileMap`. However, because I've chosen not to use any physics based movement, I don't think this is possible.
 
 The good news is, since I'm already storing the coordinates for all the cells that make up the playarea, all I need to do is check to see if the cell that the snake's head is about to move into is going to have an x or y value greater or less than the maximum x or y values used for the playarea.
 
