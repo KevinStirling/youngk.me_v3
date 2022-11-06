@@ -3,6 +3,7 @@ title: "Giving snake an apple"
 date: 2022-11-05T10:57:44-04:00
 description: 'Feeding the snake for growth, some stupid simple state management, and some code simplification'
 image: images/posts/micro_snek.png
+tags: ["godot4"]
 draft: false 
 ---
 
