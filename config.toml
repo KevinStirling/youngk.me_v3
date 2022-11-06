@@ -30,6 +30,7 @@ paginate = 3
 
   addFrame = true
   addDot = true
+  dotColor = "#004d40"
 
   highlightColor = '#004d40'
   baseColor = ''
