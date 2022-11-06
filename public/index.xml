@@ -6,7 +6,17 @@
     <description>Recent content in Writer of code, drinker of seltzer on Home</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 05 Nov 2022 10:57:44 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 06 Nov 2022 14:01:46 -0500</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A new space for snake</title>
+      <link>/posts/micro-snake-3/</link>
+      <pubDate>Sun, 06 Nov 2022 14:01:46 -0500</pubDate>
+      
+      <guid>/posts/micro-snake-3/</guid>
+      <description>Oh yeah. We&amp;rsquo;re rollin now. Bug fixes and new state trigger logic!
+Diagonal movement bug Had to change the movement vector code to fix a bug that would allow the player to move in diagonals&amp;hellip; which kind of breaks the whole rule set of Snake now doesn&amp;rsquo;t it. This is because the Input.get_vector() func will create a vector based on all inputs it recieves. Good for some games like top down 2d or 3d games, not good for snake.</description>
+    </item>
+    
     <item>
       <title>Giving snake an apple</title>
       <link>/posts/micro-snake-2/</link>

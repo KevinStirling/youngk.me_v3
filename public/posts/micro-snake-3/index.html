@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>A new space for snake - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.png">
+  <link rel="canonical" href="/posts/micro-snake-3/" />
+
+  
+  
+  <link rel="stylesheet" href="/css/style.min.27361703c29e1b70be6d0c93b59d7651e1d2d8213d2522684c45473d897de092.css">
+  
+
+  
+    <meta name="description" content="Bug fixes, new playarea, and new death triggers!"/>
+    <meta property="og:title" content="A new space for snake"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="/posts/micro-snake-3/"/>
+    <meta property="og:image" content="/images/posts/new_playarea.png"/>
+    <meta property="og:description" content="Bug fixes, new playarea, and new death triggers!"/>
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:site" content="@kevinYENG"/>
+    <meta name="twitter:creator" content="@kevinYENG"/>
+  
+
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet"> 
+</head>
+
+
+
+
+<body class='page frame page-blog-single'>
+  <div id="menu-main-mobile" class="menu-main-mobile">
+    <ul class="menu">
+        
+        
+            
+                <li class="menu-item-posts">
+                    <a href="/posts/">Posts</a>
+                </li>
+            
+        
+    </ul>
+</div>
+  <div id="wrapper" class="wrapper">
+    <div class='header'>
+  <a class="header-logo" href="/">Home</a>
+  <div class="menu-main">
+    <ul>
+      
+      
+      
+      
+      <li class="menu-item-posts active">
+        <a href="/posts/">
+          
+          <span>Posts</span>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+  <div id="toggle-menu-main-mobile" class="hamburger-trigger">
+    <button class="hamburger">Menu</button>
+  </div>
+</div>
+    
+  <div class="blog">
+    
+      <div class="author">
+  <img width="30" class="author-image" src="/images/avatar.png" />
+  <span class="author-name">Kevin Young</span>
+  <span class="author-divider"></span>
+  <span class="author-date">November 6, 2022</span>
+</div>
+    
+    <div class="intro">
+      <h1>A new space for snake<span class="dot">.</span></h1>
+      
+      <img src="/images/posts/new_playarea.png" />
+      
+    </div>
+    <div class="content">
+      <p>Oh yeah. We&rsquo;re rollin now. Bug fixes and new state trigger logic!</p>
+<h2 id="diagonal-movement-bug">Diagonal movement bug</h2>
+<p>Had to change the movement vector code to fix a bug that would allow the player to move in diagonals&hellip; which kind of breaks the whole rule set of Snake now doesn&rsquo;t it. This is because the <code>Input.get_vector()</code> func will create a vector based on all inputs it recieves. Good for some games like top down 2d or 3d games, not good for snake.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># Snake.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">func _process(_delta):
+</span></span><span class="line"><span class="cl">	if Input.get_vector(&#34;left&#34;, &#34;right&#34;, &#34;up&#34;, &#34;down&#34;) != Vector2.ZERO:
+</span></span><span class="line"><span class="cl">		if manager.current_state == GlobalVars.State.PAUSE :
+</span></span><span class="line"><span class="cl">			manager.set_state(GlobalVars.State.PLAY)
+</span></span><span class="line"><span class="cl">	if Input.is_action_just_pressed(&#34;left&#34;):
+</span></span><span class="line"><span class="cl">		input_buffer = Vector2(-1, 0)
+</span></span><span class="line"><span class="cl">	elif Input.is_action_just_pressed(&#34;right&#34;):
+</span></span><span class="line"><span class="cl">		input_buffer = Vector2(1, 0)
+</span></span><span class="line"><span class="cl">	elif Input.is_action_just_pressed(&#34;up&#34;):
+</span></span><span class="line"><span class="cl">		input_buffer = Vector2(0, -1)
+</span></span><span class="line"><span class="cl">	elif Input.is_action_just_pressed(&#34;down&#34;):
+</span></span><span class="line"><span class="cl">		input_buffer = Vector2(0, 1)
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></div><p>So I unfortunately had to break up my nice neatly coded movement code into a sequence of if statements, while still keeping the <code>get_vector</code> for detecting an input to start the game. I&rsquo;m sure theres a hip way to consolidate this but for now this&rsquo;ll do.</p>
+<h2 id="dead-snake">Dead snake</h2>
+<p>To detect if the snake&rsquo;s head has made contact with the snake&rsquo;s tail, I just added a <code>CollisionArea2d</code> to the <code>SnakeTail.tscn</code>, and add the following code to connect the <code>body_entered</code> signal.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># SnakeTail.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">extends StaticBody2D
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">@onready var col_area = $CollisionArea
+</span></span><span class="line"><span class="cl">@onready var manager = get_parent()
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">func _ready():
+</span></span><span class="line"><span class="cl">	col_area.body_entered.connect(_on_area_2d_body_entered)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">func _on_area_2d_body_entered(body):
+</span></span><span class="line"><span class="cl">	if body.is_in_group(&#34;SnakeHead&#34;):
+</span></span><span class="line"><span class="cl">		manager.set_state(GlobalVars.State.DEAD)
+</span></span></code></pre></div><p>I added the SnakeHead node to a group &ldquo;SnakeHead&rdquo; as a lazy check, I&rsquo;ll admit. This may change later if I find it stupid but it works well enough for now.</p>
+<h3 id="play-area-changes">Play area changes</h3>
+<p>As you can see from the header image, its pretty minimal. I added a new <code>TileMap</code> layer for the &ldquo;frame&rdquo;, so the playarea does not end up being massive and take forever to traverse, and I can also decorate it later if I want / when I choose a final visual style. Overall a simple but pleasing enhancement from the janky floating window with dimensions that were slightly off from the <code>TileMap</code> :D</p>
+<h3 id="detecting-wall-collision">Detecting wall collision</h3>
+<p>Ideally, in Godot 4 I could simply add a physics collision layer to the <code>TileMap</code>. However, because I&rsquo;ve chosen to not used any physics based movement, I don&rsquo;t think this is possible.</p>
+<p>The good news is, since I&rsquo;m already storing the coordinates for all the cells that make up the playarea, all I need to do is check to see if the cell that the snake&rsquo;s head is about to move into is going to have an x or y value greater or less than the maximum x or y values used for the playarea.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># GameManager.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">func _ready():
+</span></span><span class="line"><span class="cl">	bg_layer_coords = grid.get_used_cells(1)
+</span></span><span class="line"><span class="cl">	min_nav_x_y = bg_layer_coords[0]
+</span></span><span class="line"><span class="cl">	max_nav_x_y = bg_layer_coords[bg_layer_coords.size() - 1]
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">func is_in_boundaries(grid_coord):
+</span></span><span class="line"><span class="cl">	if (min_nav_x_y.x &lt; grid_coord.x) and (max_nav_x_y.x &gt; grid_coord.x):
+</span></span><span class="line"><span class="cl">		if (min_nav_x_y.y &lt; grid_coord.y) and (max_nav_x_y.y &gt; grid_coord.y):
+</span></span><span class="line"><span class="cl">			return true
+</span></span><span class="line"><span class="cl">	return false
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></div><p>This function gets called in the <code>_timer_timeout()</code> func.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># GameManager.gd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">func _timer_timeout():
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">	if snake.grid_coords.size() &gt; snake.body_segments.size() :
+</span></span><span class="line"><span class="cl">		update_snake()
+</span></span><span class="line"><span class="cl">	for s in range(snake.grid_coords.size()):
+</span></span><span class="line"><span class="cl">		if s == 0:
+</span></span><span class="line"><span class="cl">			if !is_in_boundaries(snake.grid_coords[s]):
+</span></span><span class="line"><span class="cl">				set_state(GlobalVars.State.DEAD)
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></div>
+    </div>
+  </div>
+
+    <div class="footer">
+  
+  <div class="footer-social">
+    
+      <span class="social-icon social-icon-twitter">
+        <a href="https://twitter.com/KevinYENG" title="twitter" target="_blank" >
+          <img src="/images/social/twitter.svg" width="24" height="24" alt="twitter"/>
+        </a>
+      </span>
+    
+      <span class="social-icon social-icon-github">
+        <a href="https://github.com/KevinStirling/" title="github" target="_blank" >
+          <img src="/images/social/github.svg" width="24" height="24" alt="github"/>
+        </a>
+      </span>
+    
+      <span class="social-icon social-icon-linkedin">
+        <a href="https://www.linkedin.com/in/kevin-young-5a6386b0/" title="linkedin" target="_blank" >
+          <img src="/images/social/linkedin.svg" width="24" height="24" alt="linkedin"/>
+        </a>
+      </span>
+    
+      <span class="social-icon social-icon-mastodon">
+        <a href="https://mastodon.gamedev.place/@kevinyoung" title="mastodon" target="_blank" rel="me">
+          <img src="/images/social/mastodon.svg" width="24" height="24" alt="mastodon"/>
+        </a>
+      </span>
+    
+  </div>
+  
+</div>
+  </div>
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/bundle.min.5993fcb11c07dea925a3fbd58c03c7f1857197c35fccce3aa963a12c0b3c9960.js"></script>
+  
+
+  
+  
+
+  
+  
+  
+    
+  
+
+  
+
+
+</body>
+</html>
