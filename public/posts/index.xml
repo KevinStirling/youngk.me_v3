@@ -8,6 +8,17 @@
     <language>en-us</language>
     <lastBuildDate>Sun, 24 Feb 2019 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>Godot Wild Jam 64</title>
+      <link>/posts/godot-wild-jam-64/</link>
+      <pubDate>Sun, 31 Dec 2023 15:46:28 -0500</pubDate>
+      
+      <guid>/posts/godot-wild-jam-64/</guid>
+      <description>Godot Wild Jam 64 happened this past month, with the theme Illumination, and I decided to give it a go! This was my 3rd game jam attempt, although this would be my first submitted entry. It&amp;rsquo;s called CandleRun, and you can check it out here.
+Along with the main theme, the 3 option &amp;ldquo;wild card&amp;rdquo; themes were &amp;ldquo;white out/ freezing out&amp;rdquo;, &amp;ldquo;blood is fuel&amp;rdquo;, and &amp;ldquo;trash everywhere&amp;rdquo;.
+Design Process I originally planned on a completely different game.</description>
+    </item>
+    
+    <item>
       <title>A new space for snake</title>
       <link>/posts/micro-snake-3/</link>
       <pubDate>Sun, 06 Nov 2022 14:01:46 -0500</pubDate>
